@@ -44,7 +44,15 @@ class Auth extends BaseController
     public function login2()
     {
         try {
+
+
+            $usuario = $this->request->getPost('usuario');
+            $contrasena = $this->request->getPost('contrasena');
             $user =  $this->request->getJSON();  
+            if ( $user != null ) {
+                $usuario    = $user->usuario;
+                $contrasena = $user->contrasena;  
+            }
 
             /* $usuario = '';
             $password = '';
@@ -54,19 +62,16 @@ class Auth extends BaseController
             }
             var_dump($user[0]->usuario); */
 
-            session()->set([
-                
-            ]);
 
             $usuarioModel = new UsuarioModel();
-            $usuariovalidado = $usuarioModel->where('username', $user->usuario)->first();
+            $usuariovalidado = $usuarioModel->where('username', $usuario)->first();
          
             
             
            if ( $usuariovalidado == null )
                 return $this->failNotFound('Usuario no encontrado');
 
-            if (verifyPassword($user->contrasena, $usuariovalidado["password"])):
+            if (verifyPassword($contrasena, $usuariovalidado["password"])):
                 $jwt = $this->generateJWT($usuariovalidado);
                 return $this->respond(['Token' => $jwt], 201);
             else:   
@@ -88,10 +93,10 @@ class Auth extends BaseController
             'ait' => $time, // como entero el tiempo,
             'exp' => $time + 900, // 
             'data' => [
-                'nombre' => $usuario['nombre'],
+                'nombre'   => $usuario['nombre'],
                 'username' => $usuario['username'],
-                'rol' => $usuario['rol_id']
-
+                'rol'      => $usuario['rol_id'],
+                'estado'   => $usuario['estado']
             ]
         ];
 
